@@ -1,0 +1,94 @@
+Set  X   Index Set for temperature intervals  /1*500/;
+Alias (X,X1,X2);
+Scalar count, count1;
+
+*-------------------------------------------------------------------------------
+*--------------      DEFINICIÓN DE LOS INTERVALOS DE TEMPERATURA
+Parameter TSJH(J) Temperaturas de suministro de las corrientes frias en la escala caliente
+          TTJH(J) Temperaturas objetivo de las corrientes frias en la escala caliente
+          THNO(X) Temperaturas en la escala caliente no ordenadas;
+
+TSJH(J) = TSJ(J)+HRAT;
+TTJH(J) = TTJ(J)+HRAT;
+
+Loop [I,
+     Loop [X$(Ord(X) EQ Ord(I)), THNO(X) = TSI(I); THNO(X+Card(I)) = TTI(I);];
+*     Loop [X$(Ord(X) EQ Ord(I)), THNO(X+Card(I)) = TTI(I)];
+      ];
+Loop [J,
+      Loop [X$((Ord(X)) EQ Ord(J)), THNO(X+(Card(I)*2)) = TSJH(J); THNO(X+(Card(I)*2+Card(J))) = TTJH(J)];
+*      Loop [X$(Ord(X) EQ Ord(J)), THNO(X+(Card(I)*2+Card(J))) = TTJH(J)];
+      ];
+
+
+*--------------      TEMPERATURAS  ORDENADAS
+Parameter RANGO(X)  Posición de las temperaturas
+          MT(X1,X)  Matriz de temperaturas ordenadas
+          THO(X1)   Temperaturas en la escala caliente ordenadas;
+
+
+RANGO(X) = Sum(X1$(THNO(X1) GE THNO(X)), 1);
+MT(X1,X)$(RANGO(X) EQ Ord(X1)) = THNO(X);
+
+THO(X1) = Smax[X, MT(X1,X)];
+
+*--------------      TEMPERATURAS SIN DUPLICADOS
+Parameter  RANGO1(X1) Posición de las temperaturas sin duplicados
+           MTSD(X,X1) Matriz de temperaturas sin duplicados;
+
+
+RANGO1(X1) = Sum(X$(THO(X) GE THO(X1)), 1);
+MTSD(X,X1)$(RANGO1(X1) EQ ORD(X)) = THO(X1);
+
+
+*--------------      INTERVALOS DE TEMPERATURA
+Parameter  TH(X) Temperaturas en la escala caliente
+           TC(X) Temperaturas en la escala fría;
+
+TH(X) = Smax[X1, MTSD(X,X1)];
+TC(X)$(Ord(X) LE Card(TH)) = TH(X)-HRAT;
+
+Parameter  NOK   Número de intervalos de temperatura;
+NOK = Card(TH)-1;
+
+Set K(X);
+K(X) = no;
+K(X)$(Ord(X) LE NOK) = yes;
+Alias (K,K1,K2);
+
+Parameter OrdK(X), OrdK1(X1);
+
+count = 0;
+Loop[K, count=count +1;
+         OrdK(K)=count; OrdK1(K)=count;];
+*-------------------------------------------------------------------------------
+*------------   CÁLCULO DE LAS ENTALPÍAS DISPONIBLES Y REQUERIDAS POR INTERVALO
+Parameter HS(I,X) Entalpías de las corrientes calientes en cada intervalo
+          HD(J,X) Entalpías de las corrientes frías en cada intervalo
+          HSres(I) Entalpía residual en las corrientes calientes 
+          HDres(J) Entalpía residual en las corrientes frias ;
+HSres(I) = 0;
+HDres(J) = 0;
+
+Parameter TH_(X),TC_(X);
+
+
+HS(I,X) = 0;
+Loop [I,
+      Loop [X$(Ord(X) LE NOK),
+            If[TSI(I) GE TH(X) and TTI(I) LT TH(X),
+            HS(I,X) = FCPI(I)*(TH(X)-TH(X+1))];
+            ];
+      ];
+
+
+*HS(I,K)$(TSI(I) GE TH(K) and TTI(I) LT TH(K)) = FCPI(I)*(TH(K)-TH(K+1));
+
+HD(J,X1) = 0;
+Loop [J,
+      Loop [X1$(Ord(X1) LE NOK),
+            If[TSJ(J) LT TC(X1) and TTJ(J) GE TC(X1),
+            HD(J,X1) = FCPJ(J)*(TC(X1)-TC(X1+1))];
+            ];
+      ];
+*-------------------------------------------------------------------------------

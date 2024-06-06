@@ -1,0 +1,132 @@
+*Caso de Estudio desarrollado por Kim et al. (2017)
+*-------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------
+*DEFINICIÓN DE ESTRATEGIA E INTERVALO DE HRATs PARA EFECTUAR LA BÚSQUEDA
+* HRAT ALEATORIOS DENTRO DEL INTERVALO SELECCIONADO /1/
+* INCREMENTOS EQUIDISTANTES PARA LOS HRAT DENTRO DEL INTERVALO SELECCIONADO /2/
+Scalar GenHRAT;
+GenHRAT = 1;
+
+Scalar HRAT_L HRAT inicial para la generacion de diseños base;
+HRAT_L = 15.852;
+
+Scalar HRAT_U HRAT inicial para la generacion de diseños base;
+HRAT_U = 15.852;
+
+Scalar DigHRAT Decimales despues del punto que se consideran en el HRAT; 
+DigHRAT = 3;
+
+*-------------------------------------------------------------------------------
+
+Set     I   Index Set for Hot Streams            /1*11/
+        J   Index Set for Cold Streams           /1*2/;
+
+*--------------      HOT PROCESS STREAMS
+Parameter FCPI(I)    Hot Stream Heat Capacity Flowrate
+          TSI(I)     Hot Stream Supply Temperature
+          TTI(I)     Hot Stream Target Temperature
+          FHTCI(I)   Hot Stream Film Heat Transfer Coefficient
+          QTOTI(I)   Hot Stream Enthalpy Excess;
+
+FCPI('1') = 106.50;     TSI('1') =  140.2;     TTI('1') =   39.5;    FHTCI('1') =  0.26;
+FCPI('2') =  31.81;     TSI('2') =  248.8;     TTI('2') =  110.0;    FHTCI('2') =  0.72;
+FCPI('3') =  33.93;     TSI('3') =  170.1;     TTI('3') =   60.0;    FHTCI('3') =  0.45;
+FCPI('4') =  24.58;     TSI('4') =  277.0;     TTI('4') =  121.9;    FHTCI('4') =  0.57;
+FCPI('5') = 132.20;     TSI('5') =  250.6;     TTI('5') =   90.0;    FHTCI('5') =  0.26;
+FCPI('6') = 115.76;     TSI('6') =  210.0;     TTI('6') =  163.0;    FHTCI('6') =  0.33;
+FCPI('7') = 234.98;     TSI('7') =  303.6;     TTI('7') =  270.2;    FHTCI('7') =  0.41;
+FCPI('8') =  39.81;     TSI('8') =  360.0;     TTI('8') =  290.0;    FHTCI('8') =  0.47;
+FCPI('9') =  47.85;     TSI('9') =  178.6;     TTI('9') =  108.9;    FHTCI('9') =  0.60;
+FCPI('10') = 24.53;     TSI('10') = 359.6;     TTI('10') = 280.0;    FHTCI('10') = 0.47;
+FCPI('11') = 39.81;     TSI('11') = 290.0;     TTI('11') = 115.0;    FHTCI('11') = 0.47;
+
+
+QTOTI(I)=FCPI(I)*(TSI(I)-TTI(I));
+
+*--------------      COLD PROCESS STREAMS
+Parameter FCPJ(J)    Cold Stream Heat Capacity Flowrate
+          TSJ(J)     Cold Stream Supply Temperature
+          TTJ(J)     Cold Stream Target Temperature
+          FHTCJ(J)   Cold Stream Film Heat Transfer Coefficient
+          QTOTJ(J)   Cold Stream Enthalpy Deficit;
+
+FCPJ('1') = 202.48;     TSJ('1') =  30;     TTJ('1') = 130;    FHTCJ('1') = 0.26;
+FCPJ('2') = 289.92;     TSJ('2') = 130;     TTJ('2') = 350;    FHTCJ('2') = 0.72;
+
+QTOTJ(J)=FCPJ(J)*(TTJ(J)-TSJ(J));
+
+*--------------      HEATING UTILITIES
+Parameter FCPHU      Hot Utility Equivalent Heat Capacity Flowrate
+          TSHU       Hot Utility Supply Temperature
+          TTHU       Hot Utility Target Temperature
+          FHTCHU     Hot Utility Film Heat Transfer Coefficient
+          QTOTHU     Hot Utility Total Enthalpy Input
+          HUCOST     Hot Utility Per Unit Cost;
+
+TSHU = 500;     TTHU = 499;    FHTCHU = 0.53;    HUCOST = 100;
+
+*--------------      COOLING UTILITIES
+Parameter FCPCU      Cold Utility Equivalent Heat Capacity Flowrate
+          TSCU       Cold Utility Supply Temperature
+          TTCU       Cold Utility Target Temperature
+          FHTCCU     Cold Utility Film Heat Transfer Coefficient
+          QTOTCU     Cold Utility Total Enthalpy Output
+          CUCOST     Cold Utility Per Unit Cost;
+
+TSCU = 20;     TTCU = 40;    FHTCCU = 0.53;    CUCOST = 10;
+
+*-------------------------------------------------------------------------------
+*--------------       PARAMETERS FOR CAPITAL COST OF A HEAT EXCHANGERS
+
+
+Parameter  CCFXCG     Fixed Charge of a Heat Recovery Unit (any)               /250000/
+           CCPREC     Pre-exponential Coef. for Cost of a Heat Recovery Unit   /550/
+           CCAEXP     Exponent in Cost of a Heat Recovery Unit                 /1/;
+
+Parameter  CCFXCGHU     Fixed Charge of a Heater Unit (any)                    /250000/
+           CCPRECHU     Pre-exponential Coef. for Cost of a Heater Unit        /550/
+           CCAEXPHU     Exponent in Cost of a Heater Unit                      /1/;
+
+Parameter  CCFXCGCU     Fixed Charge of a Cooler Unit (any)                   /250000/
+           CCPRECCU     Pre-exponential Coef. for Cost of a Cooler Unit       /550/
+           CCAEXPCU     Exponent in Cost of a Cooler Unit                     /1/;
+
+*-------------------------------------------------------------------------------
+*--------------       PARAMETERS FOR CAPITAL COST OF A HEAT EXCHANGERS (Linear parameters)
+* Introducir parametros linealizados si se requiere un modelo con funcion objetivo sin exponente (de otra forma omitir)
+
+
+Parameter  CCFXCGL     Linearized Fixed Charge of a Heat Recovery Unit (any)               /250000/
+           CCPRECL     Linearized Pre-exponential Coef. for Cost of a Heat Recovery Unit   /550/;
+
+Parameter  CCFXCGHUL     Linearized Fixed Charge of a Heater Unit (any)                    /250000/
+           CCPRECHUL     Linearized Pre-exponential Coef. for Cost of a Heater Unit        /550/;
+
+Parameter  CCFXCGCUL     Linearized Fixed Charge of a Cooler Unit (any)               /250000/
+           CCPRECCUL     Linearized Pre-exponential Coef. for Cost of a Cooler Unit   /550/;
+        
+
+
+*-------------------------------------------------------------------------------
+*--------------      ANNUALIZATION FACTOR FOR CAPITAL COSTS
+Parameter INTEREST    Annual interest rate /0.15/
+          NYEARS      Life of project      /5/
+          FANNUAL     Annualization factor;
+
+Parameter bicho;
+bicho=(1+INTEREST)**NYEARS;
+FANNUAL=INTEREST*bicho/(bicho-1);
+
+FANNUAL= 0.1;
+
+*-------------------------------------------------------------------------------
+
+*-------------------------------------------------------------------------------
+Scalar REC Numero aproximado de recuperadores de calor para el calculo de metas 
+       HEA Numero aproximado de calentadores para el calculo de metas 
+       COO Numero aproximado de enfriadores para el calculo de metas;
+
+       
+REC = 14;
+HEA = 1;
+COO = 3;
