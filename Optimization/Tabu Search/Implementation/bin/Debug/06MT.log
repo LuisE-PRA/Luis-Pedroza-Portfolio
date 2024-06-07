@@ -1,0 +1,5 @@
+--- Job 06MT Start 06/06/24 18:42:07 WEX-VS8 23.5.1 x86/MS Windows        
+*** Unable to open input file (RC=2) 06MT
+*** SysMsg: No such file or directory
+*** Status: Terminated due to parameter errors
+--- Job 06MT Stop 06/06/24 18:42:07 elapsed 0:00:00.009

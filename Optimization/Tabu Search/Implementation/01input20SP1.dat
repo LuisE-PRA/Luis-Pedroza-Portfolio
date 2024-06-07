@@ -1,0 +1,115 @@
+*Caso de Estudio desarrollado por Xiao et. al (2006)-Problema 20SP1
+*HRAT optimo = 42 K
+*-------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------
+*DEFINICIÓN DE ESTRATEGIA E INTERVALO DE HRATs PARA EFECTUAR LA BÚSQUEDA
+* HRAT ALEATORIOS DENTRO DEL INTERVALO SELECCIONADO /1/
+* INCREMENTOS EQUIDISTANTES PARA LOS HRAT DENTRO DEL INTERVALO SELECCIONADO /2/
+Scalar GenHRAT;
+GenHRAT = 1;
+
+*HRAT optimo = 42
+Scalar HRAT_L HRAT inicial para la generacion de diseños base;
+HRAT_L = 35;
+
+Scalar HRAT_U HRAT inicial para la generacion de diseños base;
+HRAT_U = 45;
+
+Scalar DigHRAT Decimales despues del punto que se consideran en el HRAT; 
+DigHRAT = 3;
+
+*-------------------------------------------------------------------------------
+
+Set     I   Index Set for Hot Streams            /1*10/
+        J   Index Set for Cold Streams           /1*10/;
+
+*--------------      HOT PROCESS STREAMS
+Parameter FCPI(I)    Hot Stream Heat Capacity Flowrate
+          TSI(I)     Hot Stream Supply Temperature
+          TTI(I)     Hot Stream Target Temperature
+          FHTCI(I)   Hot Stream Film Heat Transfer Coefficient
+          QTOTI(I)   Hot Stream Enthalpy Excess;
+
+FCPI('1') = 30;     TSI('1') = 453;     TTI('1') = 348;    FHTCI('1') = 2.00;
+FCPI('2') = 15;     TSI('2') = 553;     TTI('2') = 393;    FHTCI('2') = 0.60;
+FCPI('3') = 30;     TSI('3') = 453;     TTI('3') = 348;    FHTCI('3') = 0.30;
+FCPI('4') = 30;     TSI('4') = 413;     TTI('4') = 318;    FHTCI('4') = 2.00;
+FCPI('5') = 25;     TSI('5') = 493;     TTI('5') = 393;    FHTCI('5') = 0.08;
+FCPI('6') = 10;     TSI('6') = 453;     TTI('6') = 328;    FHTCI('6') = 0.02;
+FCPI('7') = 30;     TSI('7') = 443;     TTI('7') = 318;    FHTCI('7') = 2.00;
+FCPI('8') = 30;     TSI('8') = 453;     TTI('8') = 323;    FHTCI('8') = 1.50;
+FCPI('9') = 15;     TSI('9') = 553;     TTI('9') = 363;    FHTCI('9') = 1.00;
+FCPI('10') =30;     TSI('10') =453;     TTI('10') =333;    FHTCI('10') =2.00;
+
+QTOTI(I)=FCPI(I)*(TSI(I)-TTI(I));
+
+*--------------      COLD PROCESS STREAMS
+Parameter FCPJ(J)    Cold Stream Heat Capacity Flowrate
+          TSJ(J)     Cold Stream Supply Temperature
+          TTJ(J)     Cold Stream Target Temperature
+          FHTCJ(J)   Cold Stream Film Heat Transfer Coefficient
+          QTOTJ(J)   Cold Stream Enthalpy Deficit;
+
+FCPJ('1') = 20;     TSJ('1') = 313;     TTJ('1') = 503;    FHTCJ('1') = 1.50;
+FCPJ('2') = 35;     TSJ('2') = 393;     TTJ('2') = 533;    FHTCJ('2') = 2.00;
+FCPJ('3') = 35;     TSJ('3') = 313;     TTJ('3') = 463;    FHTCJ('3') = 1.50;
+FCPJ('4') = 30;     TSJ('4') = 323;     TTJ('4') = 463;    FHTCJ('4') = 2.00;
+FCPJ('5') = 20;     TSJ('5') = 323;     TTJ('5') = 523;    FHTCJ('5') = 2.00;
+FCPJ('6') = 10;     TSJ('6') = 313;     TTJ('6') = 423;    FHTCJ('6') = 0.06; 
+FCPJ('7') = 20;     TSJ('7') = 313;     TTJ('7') = 423;    FHTCJ('7') = 0.40; 
+FCPJ('8') = 35;     TSJ('8') = 393;     TTJ('8') = 483;    FHTCJ('8') = 1.50; 
+FCPJ('9') = 35;     TSJ('9') = 313;     TTJ('9') = 403;    FHTCJ('9') = 1.00; 
+FCPJ('10') =30;     TSJ('10') =333;     TTJ('10') =393;    FHTCJ('10') =0.70;
+
+QTOTJ(J)=FCPJ(J)*(TTJ(J)-TSJ(J));
+
+*--------------      HEATING UTILITIES
+Parameter FCPHU      Hot Utility Equivalent Heat Capacity Flowrate
+          TSHU       Hot Utility Supply Temperature
+          TTHU       Hot Utility Target Temperature
+          FHTCHU     Hot Utility Film Heat Transfer Coefficient
+          QTOTHU     Hot Utility Total Enthalpy Input
+          HUCOST     Hot Utility Per Unit Cost;
+
+TSHU = 598;     TTHU = 598;    FHTCHU = 1;    HUCOST = 70;
+
+*--------------      COOLING UTILITIES
+Parameter FCPCU      Cold Utility Equivalent Heat Capacity Flowrate
+          TSCU       Cold Utility Supply Temperature
+          TTCU       Cold Utility Target Temperature
+          FHTCCU     Cold Utility Film Heat Transfer Coefficient
+          QTOTCU     Cold Utility Total Enthalpy Output
+          CUCOST     Cold Utility Per Unit Cost;
+
+TSCU = 298;     TTCU = 313;    FHTCCU = 2;    CUCOST = 10;
+
+*-------------------------------------------------------------------------------
+*--------------       PARAMETERS FOR CAPITAL COST OF A HEAT EXCHANGERS
+
+
+Parameter  CCFXCG     Fixed Charge of a Heat Recovery Unit (any)               /8000/
+           CCPREC     Pre-exponential Coef. for Cost of a Heat Recovery Unit   /800/
+           CCAEXP     Exponent in Cost of a Heat Recovery Unit                 /0.8/;
+
+Parameter  CCFXCGHU     Fixed Charge of a Heater Unit (any)                    /8000/
+           CCPRECHU     Pre-exponential Coef. for Cost of a Heater Unit        /800/
+           CCAEXPHU     Exponent in Cost of a Heater Unit                      /0.8/;
+
+Parameter  CCFXCGCU     Fixed Charge of a Cooler Unit (any)               /8000/
+           CCPRECCU     Pre-exponential Coef. for Cost of a Cooler Unit   /800/
+           CCAEXPCU     Exponent in Cost of a Cooler Unit                 /0.8/;
+
+
+*-------------------------------------------------------------------------------
+*--------------      ANNUALIZATION FACTOR FOR CAPITAL COSTS
+Parameter INTEREST    Annual interest rate /0.15/
+          NYEARS      Life of project      /5/
+          FANNUAL     Annualization factor;
+
+Parameter bicho;
+bicho=(1+INTEREST)**NYEARS;
+FANNUAL=INTEREST*bicho/(bicho-1);
+
+FANNUAL=1.0;
+
+*-------------------------------------------------------------------------------
